@@ -26,12 +26,18 @@ import { HttpClient } from '@angular/common/http';
       </div>
 
       <p>{{ message() }}</p>
+
+      @if (weather()) {
+        <p>現在気温: {{ weather()?.temperature }}℃</p>
+        <p>天気コード: {{ weather()?.weathercode }}</p>
+      }
     </mat-card>
   `,
 })
 export class App {
   locationText = signal('');
   message = signal('');
+  weather = signal<{ temperature: number; weathercode: number } | null>(null);
 
   readonly http = inject(HttpClient);
 
@@ -50,8 +56,19 @@ export class App {
 
         this.http.get(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`).subscribe({
           next: (data: any) => {
-            this.locationText.set(`${data.address.city}`);
-            this.message.set('取得成功');
+            const city = data.address.city || data.address.town || data.address.village || '';
+            const state = data.address.state || '';
+            this.locationText.set(`${state} ${city}`);
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+            this.http.get(weatherUrl).subscribe({
+              next: (weatherData: any) => {
+                this.weather.set(weatherData.current_weather);
+                this.message.set('取得成功');
+              },
+              error: () => {
+                this.message.set('天気情報の取得に失敗しました');
+              }
+            });
           },
           error: (error) => {
             this.message.set('位置情報の取得に失敗しました');
