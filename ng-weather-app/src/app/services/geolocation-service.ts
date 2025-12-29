@@ -1,9 +1,12 @@
-import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GeolocationService {
+  private readonly http = inject(HttpClient);
+
   getCurrentLocation(): Promise<{ lat: number; lon: number }> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -20,5 +23,9 @@ export class GeolocationService {
         (error) => reject(error)
       );
     });
+  }
+
+  getLocationNameForQuery(cityName: string) {
+    return this.http.get(`https://nominatim.openstreetmap.org/search?format=json&q=${cityName}`);
   }
 }
