@@ -7,11 +7,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import Coordinates from '../../types/coordinates';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-coordinates-picker',
   standalone: true,
-  imports: [MatButtonModule, MatInputModule, MatIconModule, FormsModule],
+  imports: [MatButtonModule, MatInputModule, MatIconModule, MatProgressSpinnerModule, FormsModule],
   template: `
     <div style="width: 100%; margin-top: 1rem;">
       <button mat-raised-button color="primary" (click)="fetchCurrentLocation()" style="width: 100%;">
@@ -30,8 +31,15 @@ import Coordinates from '../../types/coordinates';
         </button>
       </div>
 
+      @if (isLoading()) {
+        <div style="text-align: center; margin-top: 1rem; display: flex; justify-content: center; align-items: center;">
+          <mat-progress-spinner diameter="30" mode="indeterminate" />
+        </div>
+      }
       @if (message()) {
-        <p>{{ message() }}</p>
+        <div style="text-align: center; margin-top: 1rem; ">
+          <p>{{ message() }}</p>
+        </div>
       }
     </div>
   `,
@@ -41,16 +49,21 @@ export class CoordinatesPicker {
 
   locationText = signal('');
   message = signal('');
+  isLoading = signal(false);
 
   private geoService = inject(GeolocationService);
   private locService = inject(LocationNameService);
 
   async fetchCurrentLocation() {
+    this.isLoading.set(true);
     try {
       this.locationText.set('');
+      this.message.set('');
+
       const coordinates = await this.geoService.getCurrentLocation();
       const locationData: any = await lastValueFrom(this.locService.getLocationName(coordinates.latitude, coordinates.longitude));
       const city = locationData.address.city || locationData.address.town || locationData.address.village || '';
+
       this.locationText.set(`${city}`);
       this.message.set('');
     } catch (err: any) {
@@ -72,6 +85,9 @@ export class CoordinatesPicker {
         this.message.set(typeof err === 'string' ? err : '取得に失敗しました');
       }
     }
+    finally {
+      this.isLoading.set(false);
+    }
   }
 
   async search() {
@@ -80,7 +96,9 @@ export class CoordinatesPicker {
       this.coordinatesSelected.emit(null);
       return;
     }
+    this.isLoading.set(true);
     try {
+      this.message.set('');
       const locationData: any = await lastValueFrom(
         this.geoService.getLocationByCityName(this.locationText().trim())
       );
@@ -92,10 +110,12 @@ export class CoordinatesPicker {
         latitude: parseFloat(locationData[0].lat),
         longitude: parseFloat(locationData[0].lon),
       });
-      this.message.set('');
     } catch (err) {
       this.message.set('都市情報の取得に失敗しました');
       return;
+    }
+    finally {
+      this.isLoading.set(false);
     }
   }
 }
