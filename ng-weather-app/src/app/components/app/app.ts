@@ -26,8 +26,9 @@ export class App {
 
   private weatherService = inject(WeatherService);
 
-  async onCoordinatesSelected(coordinates: Coordinates) {
+  async onCoordinatesSelected(coordinates: Coordinates | null) {
     this.weather.set(null);
+    if (!coordinates) return;
     const result = await lastValueFrom(
       this.weatherService.getCurrentWeather(coordinates.latitude, coordinates.longitude)
     );

@@ -19,7 +19,8 @@ import Coordinates from '../../types/coordinates';
       </button>
 
       <mat-form-field appearance="outline" style="width: 100%; margin-top: 1rem;">
-        <input matInput [value]="locationText()" placeholder="都市名を入力" (keyup.enter)="search()" />
+        <input matInput [value]="locationText()" placeholder="都市名を入力"
+              (input)="locationText.set($event.target.value)" (keyup.enter)="search()" />
       </mat-form-field>
 
       <div style="text-align: center;">
@@ -28,15 +29,15 @@ import Coordinates from '../../types/coordinates';
           検索
         </button>
       </div>
-    </div>
 
-    @if (message()) {
-      <p>{{ message() }}</p>
-    }
+      @if (message()) {
+        <p>{{ message() }}</p>
+      }
+    </div>
   `,
 })
 export class CoordinatesPicker {
-  @Output() coordinatesSelected = new EventEmitter<Coordinates>();
+  @Output() coordinatesSelected = new EventEmitter<Coordinates | null>();
 
   locationText = signal('');
   message = signal('');
@@ -76,6 +77,7 @@ export class CoordinatesPicker {
   async search() {
     if (!this.locationText().trim()) {
       this.message.set('都市名を入力してください');
+      this.coordinatesSelected.emit(null);
       return;
     }
     try {
