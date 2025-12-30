@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import Coodinates from '../types/coodinates';
+import Coordinates from '../types/coordinates';
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +8,7 @@ import Coodinates from '../types/coodinates';
 export class GeolocationService {
   private readonly http = inject(HttpClient);
 
-  getCurrentLocation(): Promise<Coodinates> {
+  getCurrentLocation(): Promise<Coordinates> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject('このブラウザはGeolocation APIに対応していません');
