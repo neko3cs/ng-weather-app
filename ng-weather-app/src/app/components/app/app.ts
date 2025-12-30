@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -8,11 +8,13 @@ import { WeatherService } from '../../services/weather-service';
 import Weather from '../../types/weather';
 import { lastValueFrom } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { formatDate } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatButtonModule, MatInputModule, MatCardModule, FormsModule],
+  imports: [MatButtonModule, MatInputModule, MatCardModule, MatTableModule, FormsModule],
   template: `
       <mat-card style="max-width: 400px; margin: 2rem auto; padding: 1rem;">
       <h2>お天気アプリ</h2>
@@ -21,18 +23,32 @@ import { FormsModule } from '@angular/forms';
         現在地を取得
       </button>
 
-      <div style="margin-top: 1rem; display: flex; align-items: center; gap: 8px;">
-        <mat-form-field appearance="outline" style="flex: 1;">
+      <div style="margin-top: 1rem;">
+        <mat-form-field appearance="outline" style="width: 100%;">
           <input matInput [value]="locationText()" placeholder="都市名を入力" (keyup.enter)="fetchWeather()" />
         </mat-form-field>
-        <button mat-raised-button color="accent" (click)="fetchWeather()">検索</button>
+
+        <div style="text-align: center; margin-top: 0.5rem;">
+          <button mat-raised-button color="accent" (click)="fetchWeather()">検索</button>
+        </div>
       </div>
 
       <p>{{ message() }}</p>
 
       @if (weather(); as w) {
-        <p>現在気温: {{ w.temperature }}℃</p>
-        <p>天気コード: {{ w.weathercode }}</p>
+        <table mat-table [dataSource]="weatherRows()" class="mat-elevation-z0">
+          <ng-container matColumnDef="label">
+            <td mat-cell *matCellDef="let row" style="  font-weight: 600; color: var(--mat-sys-on-surface); white-space: nowrap; padding-right: 1rem;">
+              {{ row.label }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <td mat-cell *matCellDef="let row" style="color: var(--mat-sys-on-surface-variant);">
+              {{ row.value }}
+            </td>
+          </ng-container>
+          <tr mat-row *matRowDef="let row; columns: ['label', 'value']"></tr>
+        </table>
       }
     </mat-card>
   `,
@@ -45,6 +61,24 @@ export class App {
   private geoService = inject(GeolocationService);
   private locService = inject(LocationNameService);
   private weatherService = inject(WeatherService);
+
+  weatherRows = computed<({ label: string, value: string })[]>(() => {
+    const w = this.weather();
+    if (!w) {
+      return [];
+    }
+    return [
+      { label: '現在気温', value: `${w.temperature ?? '不明'} ℃` },
+      { label: '最高気温', value: `${w.maxTemp ?? '不明'} ℃` },
+      { label: '最低気温', value: `${w.minTemp ?? '不明'} ℃` },
+      { label: '湿度', value: `${w.humidity ?? '不明'} %` },
+      { label: '降水量', value: `${w.precipitation ?? '不明'} mm` },
+      { label: '積雪量', value: `${w.snowfall ?? '不明'} cm` },
+      { label: '風速', value: `${w.windSpeed ?? '不明'} km/h` },
+      { label: '日の出', value: w.sunrise ? formatDate(new Date(w.sunrise), 'yyyy/MM/dd HH:mm', 'ja-JP') : '不明' },
+      { label: '日の入り', value: w.sunset ? formatDate(new Date(w.sunset), 'yyyy/MM/dd HH:mm', 'ja-JP') : '不明' },
+    ];
+  });
 
   async fetchCurrentLocation() {
     this.message.set('位置情報を取得中...');
@@ -107,9 +141,8 @@ export class App {
       const weatherData = await lastValueFrom(
         this.weatherService.getCurrentWeather(latitude, longitude)
       );
-      const current = weatherData?.current_weather;
-      if (current) {
-        this.weather.set(current);
+      if (weatherData) {
+        this.weather.set(weatherData);
         this.message.set('');
         return;
       } else {
