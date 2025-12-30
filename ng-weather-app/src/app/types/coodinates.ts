@@ -1,6 +1,6 @@
 type Coodinates = {
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
 };
 
 export default Coodinates;

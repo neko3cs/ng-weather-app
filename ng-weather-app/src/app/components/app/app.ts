@@ -17,28 +17,22 @@ import { FormsModule } from '@angular/forms';
       <mat-card style="max-width: 400px; margin: 2rem auto; padding: 1rem;">
       <h2>お天気アプリ</h2>
 
-      <button mat-raised-button color="primary" (click)="fetchByCurrentLocation()">
+      <button mat-raised-button color="primary" (click)="fetchCurrentLocation()">
         現在地を取得
       </button>
 
-      <div style="margin-top: 1rem;">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <input matInput placeholder="都市名を入力" [(ngModel)]="inputCity" />
+      <div style="margin-top: 1rem; display: flex; align-items: center; gap: 8px;">
+        <mat-form-field appearance="outline" style="flex: 1;">
+          <input matInput [value]="locationText()" placeholder="都市名を入力" (keyup.enter)="fetchWeather()" />
         </mat-form-field>
-        <button mat-raised-button color="accent" (click)="fetchByCity()">検索</button>
-      </div>
-
-      <div style="margin-top: 1rem;">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <input matInput [value]="locationText()" placeholder="現在地" readonly />
-        </mat-form-field>
+        <button mat-raised-button color="accent" (click)="fetchWeather()">検索</button>
       </div>
 
       <p>{{ message() }}</p>
 
-      @if (weather()) {
-        <p>現在気温: {{ weather()?.temperature }}℃</p>
-        <p>天気コード: {{ weather()?.weathercode }}</p>
+      @if (weather(); as w) {
+        <p>現在気温: {{ w.temperature }}℃</p>
+        <p>天気コード: {{ w.weathercode }}</p>
       }
     </mat-card>
   `,
@@ -48,19 +42,20 @@ export class App {
   message = signal('');
   weather = signal<Weather | null>(null);
 
-  inputCity = '';
-
   private geoService = inject(GeolocationService);
   private locService = inject(LocationNameService);
   private weatherService = inject(WeatherService);
 
-  async fetchByCurrentLocation() {
+  async fetchCurrentLocation() {
     this.message.set('位置情報を取得中...');
     this.weather.set(null);
 
     try {
-      const { lat, lon } = await this.geoService.getCurrentLocation();
-      await this.fetchWeather(lat, lon);
+      const coordinates = await this.geoService.getCurrentLocation();
+      const locationData: any = await lastValueFrom(this.locService.getLocationName(coordinates.latitude, coordinates.longitude));
+      const city = locationData.address.city || locationData.address.town || locationData.address.village || '';
+      this.locationText.set(`${city}`);
+      this.message.set('');
     } catch (err: any) {
       if (err.code) {
         switch (err.code) {
@@ -82,51 +77,49 @@ export class App {
     }
   }
 
-  async fetchByCity() {
-    if (!this.inputCity) {
+  async fetchWeather() {
+    if (!this.locationText().trim()) {
       this.message.set('都市名を入力してください');
       return;
     }
-
-    this.message.set('都市情報を取得中...');
     this.weather.set(null);
+    this.message.set('都市情報を取得中...');
 
+    let latitude = 0;
+    let longitude = 0;
     try {
-      const locData: any = await lastValueFrom(
-        this.geoService.getLocationNameForQuery(this.inputCity)
+      const locationData: any = await lastValueFrom(
+        this.geoService.getLocationByCityName(this.locationText().trim())
       );
-
-      if (!locData || !locData[0]) {
+      if (!locationData || !locationData[0]) {
         this.message.set('都市が見つかりませんでした');
         return;
       }
-
-      const lat = parseFloat(locData[0].lat);
-      const lon = parseFloat(locData[0].lon);
-
-      await this.fetchWeather(lat, lon);
-
+      latitude = parseFloat(locationData[0].lat);
+      longitude = parseFloat(locationData[0].lon);
     } catch (err) {
       this.message.set('都市情報の取得に失敗しました');
+      return;
     }
-  }
 
-  private async fetchWeather(lat: number, lon: number) {
+    this.message.set('天気情報を取得中...');
     try {
-      const locData: any = await lastValueFrom(this.locService.getLocationName(lat, lon));
-      const city = locData.address.city || locData.address.town || locData.address.village || '';
-      const state = locData.address.state || '';
-      this.locationText.set(`${state} ${city}`);
-
-      const weatherData = await lastValueFrom(this.weatherService.getCurrentWeather(lat, lon));
-      if (weatherData?.current_weather) {
-        this.weather.set(weatherData.current_weather);
-        this.message.set('取得成功');
+      const weatherData = await lastValueFrom(
+        this.weatherService.getCurrentWeather(latitude, longitude)
+      );
+      const current = weatherData?.current_weather;
+      if (current) {
+        this.weather.set(current);
+        this.message.set('');
+        return;
       } else {
+        this.weather.set(null);
         this.message.set('天気情報が取得できませんでした');
+        return;
       }
     } catch (err) {
       this.message.set('天気情報の取得に失敗しました');
+      return;
     }
   }
 }
