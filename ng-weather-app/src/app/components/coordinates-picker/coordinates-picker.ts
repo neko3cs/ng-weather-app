@@ -46,6 +46,7 @@ export class CoordinatesPicker {
 
   async fetchCurrentLocation() {
     try {
+      this.locationText.set('');
       const coordinates = await this.geoService.getCurrentLocation();
       const locationData: any = await lastValueFrom(this.locService.getLocationName(coordinates.latitude, coordinates.longitude));
       const city = locationData.address.city || locationData.address.town || locationData.address.village || '';
@@ -77,7 +78,6 @@ export class CoordinatesPicker {
       this.message.set('都市名を入力してください');
       return;
     }
-
     try {
       const locationData: any = await lastValueFrom(
         this.geoService.getLocationByCityName(this.locationText().trim())
