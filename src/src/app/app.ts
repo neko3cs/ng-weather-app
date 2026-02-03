@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatCard } from '@angular/material/card';
-import { WeatherService } from '../../services/weather-service';
-import Weather from '../../types/weather';
+import { WeatherService } from './services/weather-service';
+import Weather from './types/weather';
 import { lastValueFrom } from 'rxjs';
-import { CoordinatesPicker } from "../coordinates-picker/coordinates-picker";
-import { WeatherResult } from "../weather-result/weather-result";
-import Coordinates from '../../types/coordinates';
+import { CoordinatesPicker } from "./components/coordinates-picker/coordinates-picker";
+import { WeatherResult } from "./components/weather-result/weather-result";
+import Coordinates from './types/coordinates';
 
 @Component({
   selector: 'app-root',
