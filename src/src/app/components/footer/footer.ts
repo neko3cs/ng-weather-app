@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
           開発者(X)
         </a>
       </div>
-      <p style="font-size: 0.75rem; opacity: 0.6; margin-top: 1rem;">&copy; 2026 neko3cs</p>
+      <p style="font-size: 0.75rem; opacity: 0.6; margin-top: 1rem;">&copy; 2025 neko3cs</p>
     </footer>
   `,
 })
