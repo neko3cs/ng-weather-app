@@ -5,12 +5,13 @@ import Weather from './types/weather';
 import { lastValueFrom } from 'rxjs';
 import { CoordinatesPicker } from "./components/coordinates-picker/coordinates-picker";
 import { WeatherResult } from "./components/weather-result/weather-result";
+import { Footer } from "./components/footer/footer";
 import Coordinates from './types/coordinates';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatCard, CoordinatesPicker, WeatherResult],
+  imports: [MatCard, CoordinatesPicker, WeatherResult, Footer],
   template: `
     <mat-card style="max-width: 400px; margin: 2rem auto; padding: 1rem;">
       <h2>お天気アプリ</h2>
@@ -18,6 +19,7 @@ import Coordinates from './types/coordinates';
       @if (weather()) {
         <app-weather-result [weather]="weather()!" style="margin-top: 1rem;" />
       }
+      <app-footer />
     </mat-card>
   `,
 })
