@@ -8,9 +8,9 @@ import { MatTableModule } from '@angular/material/table';
   standalone: true,
   imports: [MatTableModule],
   template: `
-    <div style="margin-top: 1.5rem;">
-      <h3>週間天気</h3>
-      <table mat-table [dataSource]="daily" class="mat-elevation-z0" style="width: 100%;">
+    <div class="mt-6">
+      <h3 class="text-lg font-medium mb-4">週間天気</h3>
+      <table mat-table [dataSource]="daily" class="mat-elevation-z0 w-full">
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef>日付</th>
           <td mat-cell *matCellDef="let item">{{ formatDate(item.date) }}</td>

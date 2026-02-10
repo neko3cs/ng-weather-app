@@ -16,7 +16,7 @@ import Coordinates from './types/coordinates';
   imports: [MatCard, CoordinatesPicker, CurrentForecast, HourlyForecast, WeeklyForecast, Footer],
   template: `
     <mat-card style="max-width: 600px; margin: 2rem auto; padding: 1rem;">
-      <h2>お天気アプリ</h2>
+      <h2 class="text-2xl font-bold mb-4">お天気アプリ</h2>
       <app-coordinates-picker (coordinatesSelected)="onCoordinatesSelected($event)" />
       @if (weather()) {
         <app-current-forecast [current]="weather()!.current" />

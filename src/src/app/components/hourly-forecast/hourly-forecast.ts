@@ -7,15 +7,15 @@ import Weather from '../../types/weather';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div style="margin-top: 1rem;">
-      <h3>1時間ごとの天気</h3>
-      <div style="display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 0.5rem;">
+    <div class="mt-4">
+      <h3 class="text-lg font-medium mb-4">1時間ごとの天気</h3>
+      <div class="flex overflow-x-auto gap-4 pb-2">
         @for (item of filteredHourly(); track item.time) {
-          <div style="flex: 0 0 auto; text-align: center; border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; min-width: 80px;">
-            <div style="font-size: 0.8rem;">{{ formatTime(item.time) }}</div>
-            <div style="font-weight: bold; margin: 0.2rem 0;">{{ item.temperature }}℃</div>
-            <div style="font-size: 0.7rem; color: #666;">湿度: {{ item.humidity }}%</div>
-            <div style="font-size: 0.7rem; color: #666;">降水: {{ item.precipitation }}mm</div>
+          <div class="flex-none text-center border border-gray-300 p-2 rounded min-w-[80px]">
+            <div class="text-xs">{{ formatTime(item.time) }}</div>
+            <div class="font-bold my-1 text-base">{{ item.temperature }}℃</div>
+            <div class="text-[0.7rem] text-gray-600">湿度: {{ item.humidity }}%</div>
+            <div class="text-[0.7rem] text-gray-600">降水: {{ item.precipitation }}mm</div>
           </div>
         }
       </div>
