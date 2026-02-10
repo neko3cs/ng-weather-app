@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrentForecast } from './current-forecast';
 import { registerLocaleData } from '@angular/common';
 import localeJa from '@angular/common/locales/ja';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('CurrentForecast', () => {
   let component: CurrentForecast;
@@ -11,7 +12,7 @@ describe('CurrentForecast', () => {
     registerLocaleData(localeJa);
 
     await TestBed.configureTestingModule({
-      imports: [CurrentForecast]
+      imports: [CurrentForecast, MatIconModule]
     })
     .compileComponents();
 
@@ -38,17 +39,24 @@ describe('CurrentForecast', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render weather table data', () => {
+  it('should render weather data', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     
-    // Check some specific content
     const textContent = compiled.textContent;
     expect(textContent).toContain('現在の天気');
-    expect(textContent).toContain('現在気温');
-    expect(textContent).toContain('20 ℃');
-    expect(textContent).toContain('最高気温');
-    expect(textContent).toContain('25 ℃');
-    expect(textContent).toContain('日の出');
-    expect(textContent).toContain('2026/02/03 06:00');
+    expect(textContent).toContain('20');
+    expect(textContent).toContain('25℃');
+    expect(textContent).toContain('15℃');
+    expect(textContent).toContain('50%');
+    expect(textContent).toContain('0mm');
+    expect(textContent).toContain('10km/h');
+    expect(textContent).toContain('日の出: 06:00');
+    expect(textContent).toContain('日の入り: 18:00');
+  });
+
+  it('should have icons', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const icons = compiled.querySelectorAll('mat-icon');
+    expect(icons.length).toBeGreaterThan(0);
   });
 });
