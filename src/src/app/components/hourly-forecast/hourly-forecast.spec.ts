@@ -63,7 +63,7 @@ describe('HourlyForecast', () => {
     const items = compiled.querySelectorAll('div > div > div');
     // Each hourly item has 4 divs inside (time, temp, humidity, precip) plus the container
     // Let's check based on the structure @for (item of filteredHourly(); ...)
-    const forecastBoxes = compiled.querySelectorAll('div[style*="flex: 0 0 auto"]');
+    const forecastBoxes = compiled.querySelectorAll('.flex-none');
     expect(forecastBoxes.length).toBe(2);
     expect(forecastBoxes[0].textContent).toContain('20℃');
     expect(forecastBoxes[1].textContent).toContain('22℃');

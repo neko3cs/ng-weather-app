@@ -27,7 +27,7 @@ export class WeatherService {
             sunset: res.daily.sunset[0] ?? null,
             weatherCode: res.current_weather.weathercode,
           },
-          hourly: res.hourly.time.slice(0, 24).map((time, i) => ({
+          hourly: res.hourly.time.map((time, i) => ({
             time,
             temperature: res.hourly.temperature_2m[i],
             humidity: res.hourly.relativehumidity_2m[i],

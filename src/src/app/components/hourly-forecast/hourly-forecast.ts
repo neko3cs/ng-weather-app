@@ -30,7 +30,9 @@ export class HourlyForecast {
     // Round down to the current hour
     now.setMinutes(0, 0, 0);
     now.setSeconds(0, 0);
-    return this.hourly.filter(item => new Date(item.time) >= now);
+    return this.hourly
+      .filter(item => new Date(item.time) >= now)
+      .slice(0, 24);
   });
 
   formatTime(time: string) {
