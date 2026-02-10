@@ -15,15 +15,20 @@ describe('App', () => {
     
     weatherServiceMock = {
       getCurrentWeather: vi.fn().mockReturnValue(of({
-        temperature: 20,
-        windSpeed: 10,
-        humidity: 50,
-        maxTemp: 25,
-        minTemp: 15,
-        precipitation: 0,
-        snowfall: 0,
-        sunrise: '2026-02-03T06:00',
-        sunset: '2026-02-03T18:00'
+        current: {
+          temperature: 20,
+          windSpeed: 10,
+          humidity: 50,
+          maxTemp: 25,
+          minTemp: 15,
+          precipitation: 0,
+          snowfall: 0,
+          sunrise: '2026-02-03T06:00',
+          sunset: '2026-02-03T18:00',
+          weatherCode: 0
+        },
+        hourly: [],
+        daily: []
       }))
     };
 
@@ -66,6 +71,8 @@ describe('App', () => {
     fixture.detectChanges();
     
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-weather-result')).toBeTruthy();
+    expect(compiled.querySelector('app-current-forecast')).toBeTruthy();
+    expect(compiled.querySelector('app-hourly-forecast')).toBeTruthy();
+    expect(compiled.querySelector('app-weekly-forecast')).toBeTruthy();
   });
 });

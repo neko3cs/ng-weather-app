@@ -21,7 +21,7 @@ This document defines the agents (roles) involved in the development of this pro
 
 - **Role**: Implementation of Angular components and logic.
 - **Responsibilities**:
-  - Implementation of UI components such as `CoordinatesPicker` and `WeatherResult`.
+  - Implementation of UI components such as `CoordinatesPicker`, `CurrentForecast`, `HourlyForecast`, and `WeeklyForecast`.
   - Styling using Angular Material.
   - State management using RxJS and Signals.
 
